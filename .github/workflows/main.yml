@@ -1,9 +1,32 @@
-name: Publish
+name: CI
 on:
   release:
     types: [published]
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: 5.0.102
+
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: .NET Build
+        run: dotnet build Jellyfin.Plugins.Telegram/
+
   release:
+    needs: build
     name: Release
     strategy:
       matrix:
@@ -26,9 +49,9 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 5.0.102
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: Build
+      - name: Zip
         shell: bash
         run: |
           # Define some variables for things we need
