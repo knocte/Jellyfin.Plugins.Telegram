@@ -49,10 +49,15 @@ namespace Jellyfin.Plugins.Telegram
         {
             var options = GetOptions(request.User);
 
+            var text =
+                string.IsNullOrEmpty(request.Name) ? request.Name : request.Description;
+
+            text = "D:= " + text;
+
             await Notifier.SendNotification(
                 _httpClientFactory,
                 options.Token, options.ChatId, options.SilentNotificationEnabled,
-                string.IsNullOrEmpty(request.Name) ? request.Name : request.Description
+                text
             );
         }
 
